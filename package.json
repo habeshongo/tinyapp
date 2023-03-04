@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/habeshongo/tinyapp/issues"
   },
-  "homepage": "https://github.com/habeshongo/tinyapp#readme"
+  "homepage": "https://github.com/habeshongo/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
