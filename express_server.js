@@ -35,6 +35,11 @@ app.get("/urls", (req, res) =>{
   res.render("urls_index", templateVars)
 })
 
+//Adding a new route to render the new template /urls/:id.
+app.get("/urls/:id", (req, res) => {
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]/* What goes here? This was the question to figure out. */ };
+  res.render("urls_show", templateVars);
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
