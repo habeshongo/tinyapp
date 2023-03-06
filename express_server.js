@@ -65,6 +65,14 @@ app.get("/u/:id", (req, res) => {
   
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  // When there is a "click"
+  // it deletes the key and value from the object
+  delete urlDatabase[req.params.id]
+  return res.redirect('/urls')
+})
+
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
