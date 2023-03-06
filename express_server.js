@@ -35,6 +35,12 @@ app.get("/urls", (req, res) =>{
   res.render("urls_index", templateVars)
 })
 
+//This route handler will render the page with the form.
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+
 //Adding a new route to render the new template /urls/:id.
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]/* What goes here? This was the question to figure out. */ };
