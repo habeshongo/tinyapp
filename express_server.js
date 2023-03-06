@@ -7,6 +7,9 @@ const PORT = 8080; // default port 8080
 //This tells the Express app to use EJS as its templating engine.
 app.set("view engine", "ejs")
 
+
+app.use(express.urlencoded({ extended: true }));
+
 /* This object urlDatabase will keep track of all the URLs and their shortened forms.
 This is the data we'll want to show on the URLs page. 
 Therefore, we need to pass along the urlDatabase to the template. */
@@ -47,7 +50,16 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+// A function that returns a string of 6 random alphanumeric characters.
+function generateRandomString() {
+  return Math.random().toString(20).substring(2, 8);
+}
