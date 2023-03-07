@@ -3,12 +3,14 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const cookieParser = require('cookie-parser')
 
 //This tells the Express app to use EJS as its templating engine.
 app.set("view engine", "ejs")
 
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 /* This object urlDatabase will keep track of all the URLs and their shortened forms.
 This is the data we'll want to show on the URLs page. 
@@ -51,16 +53,13 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
-  console.log(urlDatabase);
   res.redirect(301, `/urls/${id}`); // Response will redirect to the original web address.
 });
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  console.log('long', longURL);
   res.redirect(longURL);
   
 });
@@ -77,6 +76,11 @@ app.post("/urls/:id", (req, res) => {
   return res.redirect('/urls')
 })
 
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie('username', username)
+  return res.redirect('/urls')
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
