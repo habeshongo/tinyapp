@@ -34,7 +34,8 @@ app.get("/hello", (req, res) => {
 
 //Adding a new route handler for /urls.
 app.get("/urls", (req, res) =>{
-  const templateVars = {urls : urlDatabase };
+  console.log(req.cookies['username'])
+  const templateVars = {urls : urlDatabase, username: req.cookies["username"] };
     /*EJS automatically knows to look inside the views directory for any template files that have the extension .ejs. This means we don't need to tell it where to find them. It also means that we do not need to include the extension of the filename when referencing it.
   When sending variables to an EJS template, we need to send them inside an object, even if we are only sending one variable. This is so we can use the key of that variable (in the above case the key is urls) to access the data within our template. */
   res.render("urls_index", templateVars)
@@ -42,13 +43,13 @@ app.get("/urls", (req, res) =>{
 
 //This route handler will render the page with the form.
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {urls : urlDatabase, username: req.cookies["username"] };
+  res.render("urls_new", templateVars);
 });
-
 
 //Adding a new route to render the new template /urls/:id.
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]/* What goes here? This was the question to figure out. */ };
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 
@@ -85,6 +86,7 @@ app.post("/login", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
 
 // A function that returns a string of 6 random alphanumeric characters.
 function generateRandomString() {
