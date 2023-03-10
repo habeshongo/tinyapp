@@ -123,6 +123,12 @@ This endpoint adds a new user object to the global users object.
 The user object includes the user's id, email and password, similar to the example above.
 */
 app.post("/register", (req, res) => {
+  if (req.body.email === "" || req.body.password === "") {
+    return res.status(400).send();
+  }
+  if (req.body.email) {
+    getUserByEmail(req.body.email);
+  }
   const id = generateRandomString();
   users[id] = {
     id: id,
@@ -133,6 +139,15 @@ app.post("/register", (req, res) => {
   console.log(users);
   return res.redirect("/urls");
 });
+
+/*This function is to find a user in the users object from its email */
+const getUserByEmail = function (email) {
+  for (const key in users) {
+    const user = users[key];
+    if (user.email === email) return user;
+  }
+  return null;
+};
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
