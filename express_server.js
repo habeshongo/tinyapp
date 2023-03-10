@@ -19,6 +19,22 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+/*
+Users is an object which will be used to store and access the users in the app.
+*/
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -92,6 +108,23 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
+  return res.redirect("/urls");
+});
+
+/*
+The code below creates the endpoint that handles the registration form data.
+This endpoint adds a new user object to the global users object.
+The user object includes the user's id, email and password, similar to the example above.
+*/
+app.post("/register", (req, res) => {
+  const id = generateRandomString();
+  users[id] = {
+    id: id,
+    email: req.body.email,
+    password: req.body.password,
+  };
+  res.cookie("user_id", id);
+  console.log(users);
   return res.redirect("/urls");
 });
 
