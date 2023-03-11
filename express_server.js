@@ -83,15 +83,19 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
+});
+
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 app.post("/urls", (req, res) => {
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   res.redirect(301, `/urls/${id}`); // Response will redirect to the original web address.
-});
-
-app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -138,6 +142,13 @@ app.post("/register", (req, res) => {
   res.cookie("user_id", id);
   console.log(users);
   return res.redirect("/urls");
+});
+
+/*The template for the login form asks for an email and password and sends a POST request to /login.*/
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  return;
 });
 
 /*This function is to find a user in the users object from its email */
