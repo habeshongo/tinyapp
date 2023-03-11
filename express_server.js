@@ -99,8 +99,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  // When there is a "click"
-  // it deletes the key and value from the object
+  // When there is a "click", it deletes the key and value from the object.
   delete urlDatabase[req.params.id];
   return res.redirect("/urls");
 });
@@ -111,9 +110,18 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie("username", username);
-  return res.redirect("/urls");
+  /* If the user email is located, compare the entered with the saved password. */
+  //If the email is located.
+  if (getUserByEmail(req.body.email) !== null) {
+    //Passwords do match.
+    if (req.body.password !== users[id].password) {
+      //If both checks pass, set the user_id cookie with the matching user's random ID.
+      res.cookie("user_id", users[id].id);
+      //Then redirect to /urls.
+      return res.redirect("/urls");
+    } else return res.status(403);
+  }
+  return res.status(403);
 });
 
 app.post("/logout", (req, res) => {
@@ -147,7 +155,7 @@ app.post("/register", (req, res) => {
 /*The template for the login form asks for an email and password and sends a POST request to /login.*/
 app.post("/login", (req, res) => {
   const email = req.body.email;
-  const password = req.body.password;
+  getUserByEmail(req.body.email);
   return;
 });
 
