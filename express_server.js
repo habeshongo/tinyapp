@@ -78,7 +78,7 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//This route render the template for the register page to login with email and password.
+//This route renders the template for the register page to login with email and password.
 app.get("/register", (req, res) => {
   const templateVars = { user: null };
   res.render("register", templateVars);
@@ -117,11 +117,11 @@ app.post("/login", (req, res) => {
 
   const user = getUserByEmail(req.body.email);
   if (!user) {
-    return res.status(400).send("User not found please register");
+    return res.status(403).send("User not found please register");
   }
 
   if (user.password !== req.body.password) {
-    return res.status(400).send("Password incorrect");
+    return res.status(403).send("Password incorrect");
   }
 
   res.cookie("user_id", user.id);
