@@ -78,11 +78,15 @@ app.get("/urls", (req, res) => {
 
 //This route handler will render the page with the form.
 app.get("/urls/new", (req, res) => {
+  // if (!req.cookies.user_id) {
+  //   res.redirect("/login");
+  // } else {
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]],
   };
   res.render("urls_new", templateVars);
+  //}
 });
 
 //Adding a new route to render the new template /urls/:id.
@@ -107,7 +111,10 @@ app.get("/register", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  res.redirect("/longURL");
+  if (!longURL) {
+    res.status(400).send("This URL does not exist.");
+  }
+  res.redirect(longURL);
 });
 
 app.get("/login", (req, res) => {
@@ -122,9 +129,15 @@ app.get("/login", (req, res) => {
 /* -----------------------------End of get routes--------------------------------------*/
 
 app.post("/urls", (req, res) => {
-  const id = generateRandomString();
-  urlDatabase[id] = req.body.longURL;
-  res.redirect(301, `/urls/${id}`); // Response will redirect to the original web address.
+  if (!req.cookies.user_id) {
+    res
+      .status(400)
+      .send("Only registered users who are logged in can shorten URLs.");
+  } else {
+    const id = generateRandomString();
+    urlDatabase[id] = req.body.longURL;
+    res.redirect(301, `/urls/${id}`); // Response will redirect to the original web address.
+  }
 });
 
 app.post("/urls/:id/delete", (req, res) => {
