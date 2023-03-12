@@ -90,7 +90,8 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  res.render("login");
+  const templateVars = { user: null };
+  res.render("login", templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -112,12 +113,12 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/login", (req, res) => {
   if (!req.body.email || !req.body.password) {
-    return res.status(400).send("Please fill out info");
+    return res.status(400).send("Please fill out the information.");
   }
 
   const user = getUserByEmail(req.body.email);
   if (!user) {
-    return res.status(403).send("User not found please register");
+    return res.status(400).send("User not found. Please register");
   }
 
   if (user.password !== req.body.password) {
