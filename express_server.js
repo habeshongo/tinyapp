@@ -10,31 +10,14 @@ app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-/*------------------------------Helper functions---------------------------------------*/
-
-// A function that returns a string of 6 random alphanumeric characters.
-const generateRandomString = function () {
-  return Math.random().toString(20).substring(2, 8);
-};
-
-/*This function is to find a user in the users object from its email */
-const getUserByEmail = function (email) {
-  for (const key in users) {
-    const user = users[key];
-    if (user.email === email) return user;
-  }
-  return null;
-};
-
-/* -------------------------End of the Helper Functions-----------------------------------*/
+/*------------------------------Objects that are used---------------------------------------*/
 
 /* This object urlDatabase will keep track of all the URLs and their shortened forms.
 This is the data we'll want to show on the URLs page.
 Therefore, we need to pass along the urlDatabase to the template. */
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b2xVn2: { longURL: "http://www.lighthouselabs.ca", userID: "b2xVn2" },
+  hsm5xK: { longURL: "http://www.google.com", userID: "hsm5xK" },
 };
 
 /*
@@ -53,6 +36,36 @@ const users = {
   },
 };
 
+/*------------------------------Helper functions---------------------------------------*/
+
+// A function that returns a string of 6 random alphanumeric characters.
+const generateRandomString = function () {
+  return Math.random().toString(20).substring(2, 8);
+};
+
+/*This function is to find a user in the users object from its email */
+const getUserByEmail = function (email) {
+  for (const key in users) {
+    const user = users[key];
+    if (user.email === email) return user;
+  }
+  return null;
+};
+
+/*This function returns the URLs where the userID is equal to the id of the currently logged-in user.*/
+const urlsForUser = function (id) {
+  /*This empty object was created to filter and store the websites from the urlDatabase that match the id (cookie) of the present user*/
+  const newObj = {};
+  for (const key in urlDatabase) {
+    if (id === urlDatabase[key].userID) {
+      newObj[key] = urlDatabase[key];
+    }
+  }
+  return newObj;
+};
+
+/* -------------------------End of the Helper Functions-----------------------------------*/
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -67,13 +80,16 @@ app.get("/hello", (req, res) => {
 
 //Adding a new route handler for /urls.
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]],
-  };
-  /*EJS automatically knows to look inside the views directory for any template files that have the extension .ejs. This means we don't need to tell it where to find them. It also means that we do not need to include the extension of the filename when referencing it.
-  When sending variables to an EJS template, we need to send them inside an object, even if we are only sending one variable. This is so we can use the key of that variable (in the above case the key is urls) to access the data within our template. */
-  res.render("urls_index", templateVars);
+  if (!req.cookies.user_id) {
+    res.status(400).send("Please register or log in to use this site.");
+  } else {
+    const filtered_urls = urlsForUser(req.cookies.user_id);
+    const templateVars = {
+      urls: filtered_urls,
+      user: users[req.cookies["user_id"]],
+    };
+    res.render("urls_index", templateVars);
+  }
 });
 
 //This route handler will render the page with the form.
@@ -87,9 +103,21 @@ app.get("/urls/new", (req, res) => {
 
 //Adding a new route to render the new template /urls/:id.
 app.get("/urls/:id", (req, res) => {
+  if (!req.cookies.user_id) {
+    return res.status(400).send("Please register and/or login.");
+  }
+
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send("This url does not exist.");
+  }
+
+  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+    return res.status(400).send("This URL is not owned by you.");
+  }
+
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
@@ -106,7 +134,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   if (!longURL) {
     res.status(400).send("This URL does not exist.");
   }
@@ -131,19 +159,44 @@ app.post("/urls", (req, res) => {
       .send("Only registered users who are logged in can shorten URLs.");
   } else {
     const id = generateRandomString();
-    urlDatabase[id] = req.body.longURL;
+    urlDatabase[id] = {
+      longURL: req.body.longURL,
+      userID: req.cookies.user_id,
+    };
     res.redirect(301, `/urls/${id}`); // Response will redirect to the original web address.
   }
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  // When there is a "click", it deletes the key and value from the object.
+  console.log("We are at delete:", req.params.id);
+  if (!req.cookies.user_id) {
+    return res.status(400).send("Please register and/or login.");
+  }
+
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send("This url does not exist.");
+  }
+
+  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+    return res.status(400).send("This URL is not owned by you.");
+  }
   delete urlDatabase[req.params.id];
   return res.redirect("/urls");
 });
 
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+  if (!req.cookies.user_id) {
+    return res.status(400).send("Please register and/or login.");
+  }
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send("This url does not exist.");
+  }
+
+  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+    return res.status(400).send("This URL is not owned by you.");
+  }
+
+  urlDatabase[req.params.id].longURL = req.body.longURL;
   return res.redirect("/urls");
 });
 
