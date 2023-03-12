@@ -80,7 +80,8 @@ app.get("/urls/:id", (req, res) => {
 
 //This route render the template for the register page to login with email and password.
 app.get("/register", (req, res) => {
-  res.render("register");
+  const templateVars = { user: null };
+  res.render("register", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
@@ -110,23 +111,39 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send("Please fill out info");
+  }
+
+  const user = getUserByEmail(req.body.email);
+  if (!user) {
+    return res.status(400).send("User not found please register");
+  }
+
+  if (user.password !== req.body.password) {
+    return res.status(400).send("Password incorrect");
+  }
+
+  res.cookie("user_id", user.id);
+  res.redirect("/urls");
+
   /* If the user email is located, compare the entered with the saved password. */
   //If the email is located.
-  if (getUserByEmail(req.body.email) !== null) {
-    //Passwords do match.
-    if (req.body.password !== users[id].password) {
-      //If both checks pass, set the user_id cookie with the matching user's random ID.
-      res.cookie("user_id", users[id].id);
-      //Then redirect to /urls.
-      return res.redirect("/urls");
-    } else return res.status(403);
-  }
-  return res.status(403);
+  // if (getUserByEmail(req.body.email) !== null) {
+  //   //Passwords do match.
+  //   if (req.body.password !== users[id].password) {
+  //     //If both checks pass, set the user_id cookie with the matching user's random ID.
+  //     res.cookie("user_id", users[id].id);
+  //     //Then redirect to /urls.
+  //     return res.redirect("/urls");
+  //   } else return res.status(403);
+  // }
+  // return res.status(403);
 });
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  return res.redirect("/urls");
+  return res.redirect("/login");
 });
 
 /*
