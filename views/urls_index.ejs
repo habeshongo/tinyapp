@@ -1,9 +1,7 @@
-<%# %>
-<%# // This file will display all the URLs and their shortened forms. %>
-<%# We need to pass it the URL data from express_server.js. %>
-
-<%# Changes to the front end files (anything in views directory) can be seen by refreshing the browser. %>
-
+<%# %> <%# // This file will display all the URLs and their shortened forms. %>
+<%# We need to pass it the URL data from express_server.js. %> <%# Changes to
+the front end files (anything in views directory) can be seen by refreshing the
+browser. %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -24,35 +22,33 @@
     <title>TinyApp</title>
   </head>
   <body>
-     <%- include('partials/_header')%>
+    <%- include('partials/_header')%>
 
-    <main style="margin: 1em;">
+    <main style="margin: 1em">
       <h3>My URLs</h3>
       <table class="table">
         <thead>
-          
           <tr>
             <th scope="col">Short URL ID</th>
-            <th scope="col">Long URL </th>
-            <th scope="col">Delete </th>
-            <th scope="col">Edit </th>
-            
+            <th scope="col">Long URL</th>
+            <th scope="col">Delete</th>
+            <th scope="col">Edit</th>
           </tr>
         </thead>
         <tbody>
           <% for (let id in urls) { %>
-            <tr>
-              <td><%= id %></td>
-              <td><%= urls[id] %></td>
-              <td>
-                <form action='/urls/<%=id%>/delete' method="POST">
-                  <button type="submit">Delete</button>
-                </form>
-              </td>
-              <td>
-                <a href="/urls/<%=id%>" class="btn btn-danger">Edit</a> 
-              </td>
-            </tr>
+          <tr>
+            <td><%= id %></td>
+            <td><%= urls[id].longURL %></td>
+            <td>
+              <form action="/urls/<%=id%>/delete" method="POST">
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+            <td>
+              <a href="/urls/<%=id%>" class="btn btn-danger">Edit</a>
+            </td>
+          </tr>
           <% } %>
         </tbody>
       </table>
