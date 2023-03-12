@@ -11,8 +11,24 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Helper functions
+
+// A function that returns a string of 6 random alphanumeric characters.
+const generateRandomString = function () {
+  return Math.random().toString(20).substring(2, 8);
+};
+
+/*This function is to find a user in the users object from its email */
+const getUserByEmail = function (email) {
+  for (const key in users) {
+    const user = users[key];
+    if (user.email === email) return user;
+  }
+  return null;
+};
+
 /* This object urlDatabase will keep track of all the URLs and their shortened forms.
-This is the data we'll want to show on the URLs page. 
+This is the data we'll want to show on the URLs page.
 Therefore, we need to pass along the urlDatabase to the template. */
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
@@ -49,7 +65,6 @@ app.get("/hello", (req, res) => {
 
 //Adding a new route handler for /urls.
 app.get("/urls", (req, res) => {
-  console.log(req.cookies["user_id"]);
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]],
@@ -164,25 +179,15 @@ app.post("/register", (req, res) => {
 
 /*The template for the login form asks for an email and password and sends a POST request to /login.*/
 app.post("/login", (req, res) => {
-  const email = req.body.email;
-  getUserByEmail(req.body.email);
-  return;
-});
-
-/*This function is to find a user in the users object from its email */
-const getUserByEmail = function (email) {
-  for (const key in users) {
-    const user = users[key];
-    if (user.email === email) return user;
+  const emailSearch = getUserByEmail(req.body.email);
+  if (emailSearch === null) {
+    res.status(400).send("This user does not exist. Please register.");
+  } else {
+    const email = req.body.email;
+    getUserByEmail(req.body.email);
   }
-  return null;
-};
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-// A function that returns a string of 6 random alphanumeric characters.
-function generateRandomString() {
-  return Math.random().toString(20).substring(2, 8);
-}
