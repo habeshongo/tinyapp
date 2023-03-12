@@ -11,7 +11,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Helper functions
+/*------------------------------Helper functions---------------------------------------*/
 
 // A function that returns a string of 6 random alphanumeric characters.
 const generateRandomString = function () {
@@ -26,6 +26,8 @@ const getUserByEmail = function (email) {
   }
   return null;
 };
+
+/* -------------------------End of the Helper Functions-----------------------------------*/
 
 /* This object urlDatabase will keep track of all the URLs and their shortened forms.
 This is the data we'll want to show on the URLs page.
@@ -96,20 +98,28 @@ app.get("/urls/:id", (req, res) => {
 //This route renders the template for the register page to login with email and password.
 app.get("/register", (req, res) => {
   const templateVars = { user: users[req.cookies["user_id"]] };
-  res.render("register", templateVars);
+  if (req.cookies.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.render("register", templateVars);
+  }
 });
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  res.redirect("/longURL");
 });
 
 app.get("/login", (req, res) => {
   const templateVars = { user: users[req.cookies["user_id"]] };
-  res.render("login", templateVars);
+  if (req.cookies.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.render("login", templateVars);
+  }
 });
 
-/* -----------------------------------------------------------------------------------------*/
+/* -----------------------------End of get routes--------------------------------------*/
 
 app.post("/urls", (req, res) => {
   const id = generateRandomString();
