@@ -94,6 +94,8 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
+/* -----------------------------------------------------------------------------------------*/
+
 app.post("/urls", (req, res) => {
   const id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
@@ -141,20 +143,23 @@ The user object includes the user's id, email and password, similar to the examp
 */
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
-    return res.status(400).send();
+    res.status(400).send("Please fill in the required fields.");
   }
-  if (req.body.email) {
-    getUserByEmail(req.body.email);
+  const emailSearch = getUserByEmail(req.body.email);
+  if (emailSearch === null) {
+    const id = generateRandomString();
+    users[id] = {
+      id: id,
+      email: req.body.email,
+      password: req.body.password,
+    };
+    res.cookie("user_id", id);
+    //console.log(users);
+    res.redirect("/urls");
+    return;
+  } else {
+    res.status(400).send("This user already exists. Please login.");
   }
-  const id = generateRandomString();
-  users[id] = {
-    id: id,
-    email: req.body.email,
-    password: req.body.password,
-  };
-  res.cookie("user_id", id);
-  console.log(users);
-  return res.redirect("/urls");
 });
 
 /*The template for the login form asks for an email and password and sends a POST request to /login.*/
