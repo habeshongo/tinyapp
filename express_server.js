@@ -78,15 +78,11 @@ app.get("/urls", (req, res) => {
 
 //This route handler will render the page with the form.
 app.get("/urls/new", (req, res) => {
-  // if (!req.cookies.user_id) {
-  //   res.redirect("/login");
-  // } else {
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]],
   };
   res.render("urls_new", templateVars);
-  //}
 });
 
 //Adding a new route to render the new template /urls/:id.
