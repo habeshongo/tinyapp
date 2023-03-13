@@ -6,6 +6,12 @@ Application to shorten the URL of a webpage.
 
 Tinyapp folder contains was an introductory project to embedded javascript and building a server in express.
 
+This is a simple multipage app:
+
+- with authentication protection
+- that reacts appropriately to the user's logged-in state,
+- and permits the user to create, read, update, and delete (CRUD) a simple entity (e.g. blog posts, URL shortener).
+
 **_BEWARE:_ This library was published for learning purposes. It is _not_ intended for use in production-grade software.**
 This project was created and published by Ashton Ferguson as part of my learnings at Lighthouse Labs.
 
