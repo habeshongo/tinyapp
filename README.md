@@ -1,6 +1,6 @@
 # tinyapp
 
-Application to shorten the URL of a webpage.
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
 
 ## Purpose
 
@@ -16,6 +16,19 @@ This is a simple multipage app:
 This project was created and published by Ashton Ferguson as part of my learnings at Lighthouse Labs.
 
 ## Documentation
+
+## Dependencies
+
+- Node.js
+- Express
+- EJS
+- bcryptjs
+- cookie-session
+
+## Getting Started
+
+- Install all dependencies (using the `npm install` command).
+- Run the development web server using the `node express_server.js` command.
 
 The following pages are contained in the app:
 
