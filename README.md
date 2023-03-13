@@ -66,3 +66,11 @@ The following pages are contained in the app:
 # Miscellaneous
 
 - Testing of the getUsersByEmail function is done with mocha and chai.
+
+# Final Product
+
+["Screenshot of the register page."](https://github.com/habeshongo/tinyapp/blob/main/docs/register_page.jpg)
+["Screenshot of the login page."](https://github.com/habeshongo/tinyapp/blob/main/docs/login_page.jpg)
+["Screenshot of page to create a shoretened URL."](https://github.com/habeshongo/tinyapp/blob/main/docs/create_shortened_URL.jpg)
+["Screenshot of the page after URL is shortened."](https://github.com/habeshongo/tinyapp/blob/main/docs/shortened_URL.jpg)
+["Screenshot of index of shortened URLS generated and saved."](https://github.com/habeshongo/tinyapp/blob/main/docs/main_URLs_page.jpg)
