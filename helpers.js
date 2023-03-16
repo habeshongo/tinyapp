@@ -1,3 +1,5 @@
+const { urlDatabase, users } = require("./database");
+
 /*------------------------------Helper functions---------------------------------------*/
 
 /*This function is to find a user in the users object from its email */
