@@ -24,7 +24,11 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (!users[req.session.userId]) {
+    res.redirect("/login");
+  } else {
+    res.redirect("/urls");
+  }
 });
 
 app.get("/urls.json", (req, res) => {
@@ -37,7 +41,7 @@ app.get("/hello", (req, res) => {
 
 //Adding a new route handler for /urls.
 app.get("/urls", (req, res) => {
-  if (!req.session.userId) {
+  if (!users[req.session.userId]) {
     res.status(400).send("Please register or log in to use this site.");
   } else {
     const filtered_urls = urlsForUser(req.session.userId);
@@ -51,6 +55,10 @@ app.get("/urls", (req, res) => {
 
 //This route handler will render the page with the form.
 app.get("/urls/new", (req, res) => {
+  if (!users[req.session.userId]) {
+    res.status(400).send("Please register or log in to use this site.");
+    return;
+  }
   const templateVars = {
     urls: urlDatabase,
     user: users[req.session.userId],
@@ -60,7 +68,7 @@ app.get("/urls/new", (req, res) => {
 
 //Adding a new route to render the new template /urls/:id.
 app.get("/urls/:id", (req, res) => {
-  if (!req.session.userId) {
+  if (!users[req.session.userId]) {
     return res.status(400).send("Please register and/or login.");
   }
 
@@ -83,7 +91,7 @@ app.get("/urls/:id", (req, res) => {
 //This route renders the template for the register page to login with email and password.
 app.get("/register", (req, res) => {
   const templateVars = { user: users[req.session.userId] };
-  if (req.session.userId) {
+  if (users[req.session.userId]) {
     res.redirect("/urls");
   } else {
     res.render("register", templateVars);
@@ -91,11 +99,12 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id].longURL;
-  if (!longURL) {
+  const URLdata = urlDatabase[req.params.id];
+  if (!URLdata) {
     res.status(400).send("This URL does not exist.");
+    return;
   }
-  res.redirect(longURL);
+  res.redirect(URLdata.longURL);
 });
 
 app.get("/login", (req, res) => {
@@ -110,7 +119,7 @@ app.get("/login", (req, res) => {
 /* -----------------------------End of get routes--------------------------------------*/
 
 app.post("/urls", (req, res) => {
-  if (!req.session.userId) {
+  if (!users[req.session.userId]) {
     res
       .status(400)
       .send("Only registered users who are logged in can shorten URLs.");
@@ -125,7 +134,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  if (!req.session.userId) {
+  if (!users[req.session.userId]) {
     return res.status(400).send("Please register and/or login.");
   }
 
@@ -141,7 +150,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  if (!req.session.userId) {
+  if (!users[req.session.userId]) {
     return res.status(400).send("Please register and/or login.");
   }
   if (!urlDatabase[req.params.id]) {
@@ -166,8 +175,7 @@ app.post("/login", (req, res) => {
     return res.status(400).send("User not found. Please register.");
   }
 
-  if (bcrypt.compareSync(req.body.password, user.password)) {
-    //use bcrypt
+  if (!bcrypt.compareSync(req.body.password, user.password)) {
     return res.status(400).send("Password incorrect.");
   }
 
@@ -176,7 +184,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("userId");
+  req.session = null;
   res.redirect("/login");
 });
 
@@ -198,7 +206,6 @@ app.post("/register", (req, res) => {
       password: bcrypt.hashSync(req.body.password, 10),
     };
     req.session.userId = id;
-    //console.log(users);
     res.redirect("/urls");
     return;
   } else {
@@ -212,8 +219,8 @@ app.post("/login", (req, res) => {
   if (emailSearch === null) {
     res.status(400).send("This user does not exist. Please register.");
   } else {
-    const email = req.body.email;
-    getUserByEmail(req.body.email, users);
+    req.session.userId = emailSearch.id;
+    res.redirect("/urls");
   }
 });
 
