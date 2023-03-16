@@ -5,7 +5,12 @@ const app = express();
 const PORT = 8080; // default port 8080
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
-const { getUserByEmail } = require("./helpers");
+const {
+  getUserByEmail,
+  generateRandomString,
+  urlsForUser,
+} = require("./helpers");
+const { urlDatabase, users } = require("./database");
 
 //This tells the Express app to use EJS as its templating engine.
 app.set("view engine", "ejs");
@@ -17,52 +22,6 @@ app.use(
     keys: ["strings"],
   })
 );
-/*------------------------------Objects that are used---------------------------------------*/
-
-/* This object urlDatabase will keep track of all the URLs and their shortened forms.
-This is the data we'll want to show on the URLs page.
-Therefore, we need to pass along the urlDatabase to the template. */
-const urlDatabase = {
-  b2xVn2: { longURL: "http://www.lighthouselabs.ca", userID: "b2xVn2" },
-  hsm5xK: { longURL: "http://www.google.com", userID: "hsm5xK" },
-};
-
-/*
-Users is an object which will be used to store and access the users in the app.
-*/
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
-};
-
-/*------------------------------Helper functions---------------------------------------*/
-
-// A function that returns a string of 6 random alphanumeric characters.
-const generateRandomString = function () {
-  return Math.random().toString(20).substring(2, 8);
-};
-
-/*This function returns the URLs where the userID is equal to the id of the currently logged-in user.*/
-const urlsForUser = function (id) {
-  /*This empty object was created to filter and store the websites from the urlDatabase that match the id (cookie) of the present user*/
-  const newObj = {};
-  for (const key in urlDatabase) {
-    if (id === urlDatabase[key].userID) {
-      newObj[key] = urlDatabase[key];
-    }
-  }
-  return newObj;
-};
-
-/* -------------------------End of the Helper Functions-----------------------------------*/
 
 app.get("/", (req, res) => {
   res.send("Hello!");
